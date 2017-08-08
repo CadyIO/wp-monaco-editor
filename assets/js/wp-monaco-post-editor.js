@@ -5,10 +5,38 @@ require.config({
     }
 });
 
+window.currentContentValue = document.getElementById('content').value;
+
+window.startMonitor = () => {
+    // When the default content editor value changes, also set the value of the Monaco editor.
+	window.monitorChanges = setInterval(() => {
+		var oldValue = window.currentContentValue;
+		var newValue = document.getElementById('content').value;
+
+		if (oldValue != newValue) {
+			var value = document.getElementById('content').value;
+
+			window.editor.setValue(value);
+
+			// window.editor.getAction('editor.action.formatDocument').run();
+
+			window.currentContentValue = newValue;
+		}
+	}, 250);
+};
+
+window.stopMonitor = () => {
+	clearInterval(window.monitorChanges);
+};
+
 // Require the Monaco editor.
 require(['vs/editor/editor.main'], function() {
     // Get the main content element.
     var contentElement = document.getElementById('content');
+
+    // Always hide the content element by pushing it off screen.
+    contentElement.style.position = 'fixed';
+    contentElement.style.left     = '-9999px';
 
     // Create a new div element to hold the Monaco editor.
     var monacoEditorElement = document.createElement('div');
@@ -21,7 +49,7 @@ require(['vs/editor/editor.main'], function() {
     contentElement.parentNode.insertBefore(monacoEditorElement, contentElement.nextSibling);
 
     // Initialize the Monaco element.
-    var editor = monaco.editor.create(monacoEditorElement, {
+    window.editor = monaco.editor.create(monacoEditorElement, {
         value: contentElement.value,
         language: 'html',
         lineNumbers: true,
@@ -35,9 +63,18 @@ require(['vs/editor/editor.main'], function() {
         wrappingIndent: "indent",
     });
 
-    // Always hide the content element by pushing it off screen.
-    contentElement.style.position = 'fixed';
-    contentElement.style.left     = '-9999px';
+	// When the Monaco editor value changes, also set the value of the default content editor.
+	window.editor.onKeyUp(() => {
+		var value = window.editor.getValue();
+
+		window.stopMonitor();
+
+		document.getElementById('content').value = value;
+
+		window.startMonitor();
+	});
+
+	window.startMonitor();
 });
 
 (function ($) {
@@ -49,19 +86,5 @@ require(['vs/editor/editor.main'], function() {
     // On 'Text' tab click, show the Monaco editor.
     $('#content-html').on('click', () => {
         $('#monaco-editor').show();
-    });
-
-    // When the Monaco editor value changes, also set the value of the default content editor.
-    $("#monaco-editor").on("change paste keyup", function() {
-        var newValue = $(this).val();
-
-        $('#content').val(newValue);
-    });
-
-    // When the default content editor value changes, also set the value of the Monaco editor.
-    $("#content").on("change paste keyup", function() {
-        var newValue = $(this).val();
-
-        $('#monaco-editor').val(newValue);
-    });
+	});
 })(jQuery);

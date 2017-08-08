@@ -68,14 +68,11 @@ if ( ! function_exists( 'wp_monaco_editor_enqueue_admin_scripts' ) ) {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $hook_suffix string The assigned hook for the plugin.
+	 * @param string $hook_suffix The assigned hook for the plugin.
 	 */
 	function wp_monaco_editor_enqueue_admin_scripts( $hook_suffix ) {
 		// Only load scripts on Post Edit page.
 		if ( 'post.php' === $hook_suffix || 'post-new.php' === $hook_suffix ) {
-			// Dequeue defaults.
-			wp_dequeue_script( 'tinymce' );
-
 			// Styles.
 			wp_enqueue_style( 'wp-monaco-editor-css', WP_MONACO_EDITOR_PLUGIN_DIR_URL . 'assets/css/wp-monaco-editor.css', array(), WP_MONACO_EDITOR_VERSION );
 
@@ -86,9 +83,6 @@ if ( ! function_exists( 'wp_monaco_editor_enqueue_admin_scripts' ) ) {
 
 		// Only load scripts on Plugin editor page.
 		if ( 'plugin-editor.php' === $hook_suffix || 'theme-editor.php' === $hook_suffix ) {
-			// Dequeue defaults.
-			wp_dequeue_script( 'tinymce' );
-
 			// Styles.
 			wp_enqueue_style( 'wp-monaco-editor-css', WP_MONACO_EDITOR_PLUGIN_DIR_URL . 'assets/css/wp-monaco-editor.css', array(), WP_MONACO_EDITOR_VERSION );
 
@@ -101,3 +95,26 @@ if ( ! function_exists( 'wp_monaco_editor_enqueue_admin_scripts' ) ) {
 } // wp_monaco_editor_enqueue_admin_scripts
 
 add_action( 'admin_enqueue_scripts', 'wp_monaco_editor_enqueue_admin_scripts' );
+
+// if ( ! function_exists( 'wp_monaco_editor_tinymce_setup_function' ) ) {
+
+// 	/**
+// 	 * Hook into TinyMCE init.
+// 	 *
+// 	 * @since 1.0.0
+// 	 *
+// 	 * @param array $init The functions passed to the TinyMCE init.
+// 	 */
+// 	function wp_monaco_editor_tinymce_setup_function( $init ) {
+// 		$init['init_instance_callback'] = 'function(editor) {
+// 			editor.on("Change", function (e) {
+// 				tinyOnChange(editor, e);
+// 			});
+// 		}';
+
+// 		return $init;
+// 	}
+
+// } // wp_monaco_editor_tinymce_setup_function
+
+// add_filter( 'tiny_mce_before_init', 'wp_monaco_editor_tinymce_setup_function' );

@@ -25,7 +25,7 @@ require(['vs/editor/editor.main'], function() {
     var fileExtension = fileNameSplit[fileNameSplit.length - 1];
 
     // Initialize the Monaco element.
-    var editor = monaco.editor.create(monacoEditorElement, {
+    window.editor = monaco.editor.create(monacoEditorElement, {
         value: contentElement.value,
         language: fileExtension,
         lineNumbers: true,
@@ -39,23 +39,15 @@ require(['vs/editor/editor.main'], function() {
         wrappingIndent: "indent",
     });
 
+	// When the Monaco editor value changes, also set the value of the default content editor.
+	window.editor.onKeyUp(() => {
+		var value = window.editor.getValue();
+
+		document.getElementById('newcontent').value = value;
+	});
+
     // Always hide the content element by pushing it off screen.
     contentElement.style.position = 'fixed';
     contentElement.style.left     = '-9999px';
 });
-
-(function ($) {
-    // When the Monaco editor value changes, also set the value of the default content editor.
-    $("#monaco-editor").on("change paste keyup", function() {
-        var newValue = $(this).val();
-
-        $('#newcontent').val(newValue);
-    });
-
-    // When the default content editor value changes, also set the value of the Monaco editor.
-    $("#newcontent").on("change paste keyup", function() {
-        var newValue = $(this).val();
-
-        $('#monaco-editor').val(newValue);
-    });
-})(jQuery);
+// })(jQuery);
